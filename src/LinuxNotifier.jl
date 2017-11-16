@@ -80,9 +80,9 @@ if is_unix() || is_linux()
     ToAddress="not-specified"\n
 
     """
-    function email(message; subject="$(now())", ToAddress="not-specified")
+    function email(message; subject="$(now())", to="", attachment="")
         output_dir = "$(Pkg.dir())/LinuxNotifier/email"
-        if ToAddress == "not-specified"
+        if to == ""
             if ispath(output_dir * "/address.txt")
                 ToAddress = readline(output_dir * "/address.txt")
             else
@@ -94,7 +94,12 @@ if is_unix() || is_linux()
                 return
             end
         end
-        run(pipeline(`echo $message`, `mail -s $subject $ToAddress`))
+
+        if attachment == ""
+            run(pipeline(`echo $message`, `mail -s $subject $to`))
+        else
+            run(pipeline(`echo $message`, `mail -s $subject $to -A $attachment`))
+        end
     end
 end # if
 end # module
